@@ -14,13 +14,15 @@ public class TransaksiModel implements Serializable {
    @Id
    @GeneratedValue(strategy = GenerationType.AUTO)
    @Column(name = "transaksi_id")
-   private int transaksiId;
+   private String transaksiId;
 
-   @Column(name = "qr_code")
-   private String qrCode;
+   @ManyToOne
+   @JoinColumn(name = "qr_code", referencedColumnName = "qr_code", insertable = false, updatable = false)
+   private CustomerModel customer;
 
-   @Column(name = "rfid")
-   private String rfid;
+   @ManyToOne
+   @JoinColumn(name = "rfid", referencedColumnName = "rfid", insertable = false, updatable = false)
+   private BarangModel barang;
 
    @Column(name = "harga_satuan")
    private int hargaSatuan;
