@@ -10,25 +10,25 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import com.backend.xmart.dto.response.ResponseBody;
 
-@RestController
-@RequestMapping("/barang")
+@RestController // Anotasi ini menandakan bahwa kelas ini adalah controller dan setiap metode di dalamnya akan menghasilkan respons JSON.
+@RequestMapping("/barang") // Menetapkan URL dasar untuk semua endpoint dalam kelas ini, yaitu /barang.
 public class BarangController {
 
-   @Autowired
+   @Autowired // Menyuntikkan instance BarangService ke dalam BarangController.
    private BarangService barangService;
 
-   // get all barangs
-   @GetMapping("/all")
+   // Endpoint untuk mendapatkan semua barang dengan pagination
+   @GetMapping("/all") // Menangani permintaan HTTP GET ke /barang/all.
    public ResponseEntity<ResponseBody> getAllBarangs(
-      @PageableDefault(page = 0, size = 10, sort = "rfid")
+      @PageableDefault(page = 0, size = 10, sort = "rfid") // Mengatur default pagination: halaman pertama, ukuran 10, diurutkan berdasarkan field rfid.
       Pageable pageable) {
-      return barangService.getAllBarangs(pageable);
+      return barangService.getAllBarangs(pageable); // Memanggil metode getAllBarangs dari BarangService dan mengembalikan hasilnya.
    }
 
-   // find barang by rfid
-   @GetMapping("/rfid")
-   public ResponseEntity<ResponseBody> getBarangByRfid(@RequestParam String rfid) {
-      return barangService.getBarangByRfid(rfid);
+   // Endpoint untuk menemukan barang berdasarkan RFID
+   @GetMapping("/rfid") // Menangani permintaan HTTP GET ke /barang/rfid.
+   public ResponseEntity<ResponseBody> getBarangByRfid(@RequestParam String rfid) { // Mengambil parameter rfid dari query string.
+      return barangService.getBarangByRfid(rfid); // Memanggil metode getBarangByRfid dari BarangService dan mengembalikan hasilnya.
    }
 
 }

@@ -10,26 +10,25 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import com.backend.xmart.dto.response.ResponseBody;
 
-
-@RestController
-@RequestMapping("/customer")
+@RestController // Anotasi ini menandakan bahwa kelas ini adalah controller dan setiap metode di dalamnya akan menghasilkan respons JSON.
+@RequestMapping("/customer") // Menetapkan URL dasar untuk semua endpoint dalam kelas ini, yaitu /customer.
 public class CustomerController {
 
-   @Autowired
+   @Autowired // Menyuntikkan instance CustomerService ke dalam CustomerController.
    private CustomerService customerService;
 
-   // get all customers
-   @GetMapping("/all")
+   // Endpoint untuk mendapatkan semua customer dengan pagination
+   @GetMapping("/all") // Menangani permintaan HTTP GET ke /customer/all.
    public ResponseEntity<ResponseBody> getAllCustomers(
-      @PageableDefault(page = 0, size = 10, sort = "qrCode")
+      @PageableDefault(page = 0, size = 10, sort = "qrCode") // Mengatur default pagination: halaman pertama, ukuran 10, diurutkan berdasarkan field qrCode.
       Pageable pageable) {
-      return customerService.getAllCustomers(pageable);
+      return customerService.getAllCustomers(pageable); // Memanggil metode getAllCustomers dari CustomerService dan mengembalikan hasilnya.
    }
 
-   // find customer by qr code
-   @GetMapping("/qr-code")
-   public ResponseEntity<ResponseBody> getCustomerByQrCode(@RequestParam String qrCode) {
-      return customerService.getCustomerByQrCode(qrCode);
+   // Endpoint untuk menemukan customer berdasarkan QR code
+   @GetMapping("/qr-code") // Menangani permintaan HTTP GET ke /customer/qr-code.
+   public ResponseEntity<ResponseBody> getCustomerByQrCode(@RequestParam String qrCode) { // Mengambil parameter qrCode dari query string.
+      return customerService.getCustomerByQrCode(qrCode); // Memanggil metode getCustomerByQrCode dari CustomerService dan mengembalikan hasilnya.
    }
 
 }
