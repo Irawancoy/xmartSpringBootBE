@@ -1,74 +1,52 @@
-// withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhub-password')]) {
-//     // some block
-// }
-
 pipeline {
     agent any
-    tools {
-        maven 'jenkins-maven'
-    }
 
     stages {
-        stage('Git Checkout') {
+        stage('Checkout SCM') {
             steps {
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Irawancoy/xmartSpringBootBE.git']])
-                bat 'mvn clean install'
-                echo 'Git Checkout Completed'
+                git url: 'https://github.com/Irawancoy/xmartSpringBootBE.git', branch: 'main'
+            }
+        }
+        stage('Tool Install') {
+            steps {
+                // Ganti perintah bat menjadi sh
+                sh 'echo Installing tools...'
             }
         }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    bat 'mvn clean package'
-                    bat '''mvn clean verify sonar:sonar -Dsonar.projectKey=xmart-java -Dsonar.projectName="xmart-java" -Dsonar.host.url=http://localhost:9000'''
-                    echo 'SonarQube Analysis Completed'
+                    sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=xmart-java -Dsonar.projectName="xmart-java" -Dsonar.host.url=http://localhost:9000 -Dsonar.token=sqp_be60afdec77c4881d5ced821bde3a4ce2e56117e'
                 }
             }
         }
         stage('Quality Gate') {
             steps {
-                waitForQualityGate abortPipeline: true
-                echo 'Quality Gate Completed'
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
-
         stage('Build Docker Image') {
             steps {
-                script {
-                    bat 'docker build -t irawan/xmart-java .'
-                    echo 'Build Docker Image Completed'
-                }
+                sh 'docker build -t xmart-java .'
             }
         }
-
         stage('Docker Push') {
             steps {
-                script {
-                    withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhub-password')]) {
-                        bat '''docker login -u irawan123 -p "%dockerhub-password%"'''
-                    }
-                    bat 'docker push irawan/xmart-java'
-                    echo 'Docker Push Completed'
-                }
+                sh 'docker push xmart-java'
             }
         }
-
         stage('Docker Run') {
             steps {
-                script {
-                    bat 'docker run -d --name xmart-java -p 8099:8080 irawan/xmart-java'
-                    echo 'Docker Run Completed'
-                }
+                sh 'docker run -d -p 8080:8080 xmart-java'
             }
         }
     }
-    
+
     post {
         always {
-            script {
-                bat 'docker logout'
-                echo 'Docker Logout Completed'
-            }
+            sh 'echo Cleaning up...'
         }
     }
 }
