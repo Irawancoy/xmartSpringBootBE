@@ -16,13 +16,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh '
-                    mvn clean verify sonar:sonar \
-                        -Dsonar.projectKey=xmart-java \
-                        -Dsonar.projectName="xmart-java" \
-                        -Dsonar.host.url=http://localhost:9000 \
-                        -Dsonar.token=sqp_be60afdec77c4881d5ced821bde3a4ce2e56117e \
-                    '
+                    sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=xmart-java -Dsonar.projectName="xmart-java" -Dsonar.host.url=http://localhost:9000 -Dsonar.token=sqp_2b2f3456ee7fee55dbfd218fe7285f17c5a09780'
                 }
             }
         }
