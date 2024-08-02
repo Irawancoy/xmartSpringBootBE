@@ -18,7 +18,6 @@ public class TransaksiService {
 
    @Autowired
    private TransaksiRepository transaksiRepository;
-
    public ResponseEntity<ResponseBody> getAllTransaksi(Pageable pageable) {
       ResponseBody responseBody = new ResponseBody();
       try {
