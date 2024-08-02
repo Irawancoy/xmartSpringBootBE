@@ -9,14 +9,13 @@ pipeline {
         }
         stage('Tool Install') {
             steps {
-                // Ganti perintah bat menjadi sh
                 sh 'echo Installing tools...'
             }
         }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=xmart-java -Dsonar.projectName="xmart-java" -Dsonar.host.url=http://localhost:9000 -Dsonar.token=sqp_be60afdec77c4881d5ced821bde3a4ce2e56117e'
+                    sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=xmart-java -Dsonar.projectName="xmart-java" -Dsonar.host.url=http://sonarqube:9000 -Dsonar.token=sqp_be60afdec77c4881d5ced821bde3a4ce2e56117e'
                 }
             }
         }
@@ -30,6 +29,13 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t xmart-java .'
+            }
+        }
+        stage('Docker Login') {
+            steps {
+                withDockerRegistry([credentialsId: 'dockerhub-credentials', url: '']) {
+                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+                }
             }
         }
         stage('Docker Push') {
