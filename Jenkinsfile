@@ -9,18 +9,24 @@ pipeline {
         }
         stage('Tool Install') {
             steps {
-                // Ganti perintah bat menjadi sh
+                // Menggunakan perintah sh untuk shell script
                 sh 'echo Installing tools...'
             }
         }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=xmart-java -Dsonar.projectName="xmart-java" -Dsonar.host.url=http://localhost:9000 -Dsonar.token=sqp_2b2f3456ee7fee55dbfd218fe7285f17c5a09780'
+                    sh """
+                    mvn clean verify sonar:sonar \
+                    -Dsonar.projectKey=xmart-java \
+                    -Dsonar.projectName='xmart-java' \
+                    -Dsonar.host.url=http://172.19.0.2:9000 \
+                    -Dsonar.token=sqp_2b2f3456ee7fee55dbfd218fe7285f17c5a09780
+                    """
                 }
             }
         }
-         stage("Quality Gate") {
+        stage("Quality Gate") {
             steps {
                 waitForQualityGate abortPipeline: true
                 echo 'Quality Gate Completed'
