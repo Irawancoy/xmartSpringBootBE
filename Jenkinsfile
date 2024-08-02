@@ -20,12 +20,12 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     bat 'mvn clean package'
-                    bat ''' mvn clean verify sonar:sonar -Dsonar.projectKey=xmart-java -Dsonar.projectName='xmart-java'' -Dsonar.host.url=http://localhost:9000 '''
+                    bat '''mvn clean verify sonar:sonar -Dsonar.projectKey=xmart-java -Dsonar.projectName="xmart-java" -Dsonar.host.url=http://localhost:9000'''
                     echo 'SonarQube Analysis Completed'
                 }
             }
         }
-        stage("Quality Gate") {
+        stage('Quality Gate') {
             steps {
                 waitForQualityGate abortPipeline: true
                 echo 'Quality Gate Completed'
@@ -45,14 +45,15 @@ pipeline {
             steps {
                 script {
                     withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhub-password')]) {
-                        bat ''' docker login -u irawan123 -p "%dockerhub-password%" '''
+                        bat '''docker login -u irawan123 -p "%dockerhub-password%"'''
                     }
                     bat 'docker push irawan/xmart-java'
+                    echo 'Docker Push Completed'
                 }
             }
         }
 
-        stage ('Docker Run') {
+        stage('Docker Run') {
             steps {
                 script {
                     bat 'docker run -d --name xmart-java -p 8099:8080 irawan/xmart-java'
@@ -60,11 +61,14 @@ pipeline {
                 }
             }
         }
-
     }
+    
     post {
         always {
-            bat 'docker logout'
+            script {
+                bat 'docker logout'
+                echo 'Docker Logout Completed'
+            }
         }
     }
 }
