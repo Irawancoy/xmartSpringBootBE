@@ -34,14 +34,9 @@ pipeline {
                 }
             }
         }
-        stage("Quality Gate") {
+         stage("Quality Gate") {
             steps {
-                script {
-                    def qualityGate = waitForQualityGate()
-                    if (qualityGate.status != 'OK') {
-                        error "Pipeline aborted due to quality gate failure: ${qualityGate.status}"
-                    }
-                }
+                waitForQualityGate abortPipeline: true
                 echo 'Quality Gate Completed'
             }
         }
