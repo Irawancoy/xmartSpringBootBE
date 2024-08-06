@@ -7,7 +7,6 @@ pipeline {
         jdk 'jdk' 
     }
 
-
     stages {
         stage('Checkout SCM') {
             steps {
@@ -16,20 +15,20 @@ pipeline {
         }
         stage('Tool Install') {
             steps {
-                sh 'echo Installing tools...'
-                sh 'mvn --version'
-                sh 'java -version'
-                sh '"C:\\Program Files\\Git\\bin\\git.exe" --version' 
+                bat 'echo Installing tools...'
+                bat 'mvn --version'
+                bat 'java -version'
+                bat '"C:\\Program Files\\Git\\bin\\git.exe" --version' 
             }
         }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh """
-                       mvn clean verify sonar:sonar \
-                        -Dsonar.projectKey=xmart \
-                        -Dsonar.projectName='xmart' \
-                        -Dsonar.host.url=http://localhost:9000 \
+                    bat """
+                       mvn clean verify sonar:sonar ^
+                        -Dsonar.projectKey=xmart ^
+                        -Dsonar.projectName='xmart' ^
+                        -Dsonar.host.url=http://localhost:9000 ^
                         -Dsonar.login=sqp_065a07c73cba8f74728ef2eba17f074253336fe4
                     """
                 }
@@ -50,7 +49,7 @@ pipeline {
 
     post {
         always {
-            sh 'echo Cleaning up...'
+            bat 'echo Cleaning up...'
         }
     }
 }
