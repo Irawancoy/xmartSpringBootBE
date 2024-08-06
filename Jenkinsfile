@@ -34,7 +34,7 @@ pipeline {
                 }
             }
         }
-     stage('Quality Gate') {
+       stage('Quality Gate') {
     steps {
         script {
             def taskId = 'dc9158f2-c1f8-4eee-8afc-ae49876162b2' // Ganti dengan ID tugas yang tepat
@@ -65,6 +65,7 @@ pipeline {
     }
 }
 
+    }
     
     post {
         success {
