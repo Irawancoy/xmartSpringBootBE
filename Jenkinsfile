@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     tools {
-        git 'Default' 
-        maven 'jenkins-maven' 
-        jdk 'jdk' 
+        git 'Default'
+        maven 'jenkins-maven'
+        jdk 'jdk'
     }
 
     stages {
@@ -18,20 +18,41 @@ pipeline {
                 bat 'echo Installing tools...'
                 bat 'mvn --version'
                 bat 'java -version'
-                bat '"C:\\Program Files\\Git\\bin\\git.exe" --version' 
+                bat '"C:\\Program Files\\Git\\bin\\git.exe" --version'
             }
         }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     bat """
-                       mvn clean verify sonar:sonar ^
+                        mvn clean verify sonar:sonar ^
                         -Dsonar.projectKey=xmart ^
                         -Dsonar.projectName='xmart' ^
                         -Dsonar.host.url=http://localhost:9000 ^
                         -Dsonar.token=sqp_316cdde84ab989f3e5cb198f9bfb7093b80e366e
                     """
                 }
+            }
+        }
+        stage('Quality Gate') {
+            steps {
+                script {
+                    def qg = waitForQualityGate()
+                    if (qg.status != 'SUCCESS') {
+                        error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                    } else {
+                        echo "Quality Gate passed: ${qg.status}"
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhub-password')]) {
+                echo "Using Docker Hub password: ${env.dockerhub-password}"
+              
             }
         }
     }
