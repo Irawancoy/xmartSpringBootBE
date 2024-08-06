@@ -39,7 +39,9 @@ pipeline {
                 script {
                     def qg = waitForQualityGate()
                     if (qg.status !='PENDING') {
+                       if (qg.status != 'IN_PROGRESS'){
                         echo "Quality Gate status: ${qg.status}"
+                       }
                     } else {
                         error "Pipeline aborted due to Quality Gate failure"
                     }
