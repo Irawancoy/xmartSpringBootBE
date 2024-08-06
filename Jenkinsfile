@@ -37,11 +37,12 @@ pipeline {
         stage('Docker Push'){
             steps{
                 script{
-                    withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhub-password')]) {
-                        bat '''docker login -u irawan123 -p $dockerhub-password'''
-                    }
-                    bat 'docker push  irawan123/xmart .'
+                    withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhub-passsword')]) {
+                        bat 'docker login -u irawan123 -p %dockerhub-passsword%'
+                        bat 'docker build -t irawancoy/xmart-spring-boot-be .'
+                        bat 'docker push irawancoy/xmart-spring-boot-be'
                 }
+                  
             }
         }
 
