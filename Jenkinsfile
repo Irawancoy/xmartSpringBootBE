@@ -1,6 +1,13 @@
 pipeline {
     agent any
 
+    tools {
+        git 'Default' 
+        maven 'jenkins-maven' 
+        jdk 'jdk' 
+    }
+
+
     stages {
         stage('Checkout SCM') {
             steps {
@@ -9,42 +16,34 @@ pipeline {
         }
         stage('Tool Install') {
             steps {
-                // Menggunakan perintah sh untuk shell script
                 sh 'echo Installing tools...'
+                sh 'mvn --version'
+                sh 'java -version'
+                sh '"C:\\Program Files\\Git\\bin\\git.exe" --version' 
             }
         }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh """
-                    mvn clean verify sonar:sonar \
-   -Dsonar.projectKey=xmart \
-   -Dsonar.projectName='xmart' \
-   -Dsonar.host.url=http://localhost:9000 \
-   -Dsonar.token=sqp_065a07c73cba8f74728ef2eba17f074253336fe4
+                       mvn clean verify sonar:sonar \
+                        -Dsonar.projectKey=xmart \
+                        -Dsonar.projectName='xmart' \
+                        -Dsonar.host.url=http://localhost:9000 \
+                        -Dsonar.login=sqp_065a07c73cba8f74728ef2eba17f074253336fe4
                     """
                 }
             }
         }
         stage("Quality Gate") {
             steps {
-                waitForQualityGate abortPipeline: true
+                script {
+                    def qualityGate = waitForQualityGate()
+                    if (qualityGate.status != 'OK') {
+                        error "Pipeline aborted due to quality gate failure: ${qualityGate.status}"
+                    }
+                }
                 echo 'Quality Gate Completed'
-            }
-        }
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t xmart .'
-            }
-        }
-        stage('Docker Push') {
-            steps {
-                sh 'docker push xmart'
-            }
-        }
-        stage('Docker Run') {
-            steps {
-                sh 'docker run -d -p 8080:8080 xmart'
             }
         }
     }
