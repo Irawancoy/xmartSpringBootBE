@@ -29,7 +29,7 @@ pipeline {
                         -Dsonar.projectKey=xmart ^
                         -Dsonar.projectName='xmart' ^
                         -Dsonar.host.url=http://localhost:9000 ^
-                        -Dsonar.login=sqp_065a07c73cba8f74728ef2eba17f074253336fe4
+                        -Dsonar.token=sqp_de0e88c18afc7e7e29e95da6e1caa14f8e9c6de7
                     """
                 }
             }
