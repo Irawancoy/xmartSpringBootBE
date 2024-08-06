@@ -38,13 +38,20 @@ pipeline {
             steps {
                 script {
                     def qg = waitForQualityGate()
-                    if (qg.status !='PENDING'&& qg.status != 'IN_PROGRESS') {
-                        echo "Quality Gate status: ${qg.status}"
-                     
-                    } else {
-                        error "Pipeline aborted due to Quality Gate failure"
+                    def previousStatus = ''
+                    while (qg.status == 'PENDING' || qg.status == 'IN_PROGRESS') {
+                        qg = waitForQualityGate() // Poll for updated status
+                        if (qg.status != previousStatus) {
+                            echo "Quality Gate status changed: ${qg.status}"
+                            previousStatus = qg.status
+                        }
+                        sleep(10) // Wait for 10 seconds before checking again
                     }
-                     
+                    if (qg.status == 'OK') {
+                        echo "Quality Gate passed: ${qg.status}"
+                    } else {
+                        error "Pipeline aborted due to Quality Gate failure: ${qg.status}"
+                    }
                 }
             }
         }
