@@ -38,10 +38,9 @@ pipeline {
             steps {
                 script {
                     def qg = waitForQualityGate()
-                    if (qg.status !='PENDING') {
-                       if (qg.status != 'IN_PROGRESS'){
+                    if (qg.status !='PENDING'&& qg.status != 'IN_PROGRESS') {
                         echo "Quality Gate status: ${qg.status}"
-                       }
+                     
                     } else {
                         error "Pipeline aborted due to Quality Gate failure"
                     }
