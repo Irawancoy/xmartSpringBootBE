@@ -34,17 +34,5 @@ pipeline {
                 }
             }
         }
-         stage("Quality Gate") {
-            steps {
-                //tampilkan hasil quality gate
-                echo 'Quality Gate Completed'
-            }
-        }
-    }
-
-    post {
-        always {
-            bat 'echo Cleaning up...'
-        }
     }
 }
