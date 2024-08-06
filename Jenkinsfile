@@ -34,13 +34,22 @@ pipeline {
                 }
             }
         }
+        stage('Docker Push'){
+            steps{
+                script{
+                    withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhub-password')]) {
+                        bat '''docker login -u irawan123 -p $dockerhub-password'''
+                    }
+                    bat 'docker push  irawan123/xmart .'
+                }
+            }
+        }
+
     }
     
     post {
-        success {
-            withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhub-password')]) {
-                echo "Using Docker Hub password: ${env.dockerhub-password}"
-            }
+        always {
+            bat 'docker logout'
         }
     }
 }
