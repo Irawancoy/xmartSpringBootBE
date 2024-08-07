@@ -7,6 +7,12 @@ pipeline {
         jdk 'jdk'
     }
 
+    environment {
+        BUILD_NUMBER_ENV = "${env.BUILD_NUMBER}"
+        TEXT_SUCCESS_BUILD = "[#${env.BUILD_NUMBER}] Project Name : ${JOB_NAME} is Success"
+        TEXT_FAILURE_BUILD = "[#${env.BUILD_NUMBER}] Project Name : ${JOB_NAME} is Failure"
+    }
+
     stages {
         stage('Checkout SCM') {
             steps {
@@ -34,6 +40,26 @@ pipeline {
                 }
             }
         }
+    }
+    post{
+        always{
+            echo 'This will always run'
+        }
+         success {
+            script{
+                 withCredentials([string(credentialsId: 'telegram-token', variable: 'TOKEN'), string(credentialsId: 'telegram-chat-id', variable: 'CHAT_ID')]) {
+                    bat ''' curl -s -X POST https://api.telegram.org/bot"%TOKEN%"/sendMessage -d chat_id="%CHAT_ID%" -d text="%TEXT_SUCCESS_BUILD%" '''
+                 }
+            }
+        }
+        failure{
+            script{
+                 withCredentials([string(credentialsId: 'telegram-token', variable: 'TOKEN'), string(credentialsId: 'telegram-chat-id', variable: 'CHAT_ID')]) {
+                    bat ''' curl -s -X POST https://api.telegram.org/bot"%TOKEN%"/sendMessage -d chat_id="%CHAT_ID%" -d text="%TEXT_FAILURE_BUILD%" '''
+                 }
+            }
+        }
+   
     }
     
 }
